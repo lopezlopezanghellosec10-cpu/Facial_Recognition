@@ -1,0 +1,14 @@
+# Entorno virtual y archivos temporales de Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Datos locales: evita subir fotos o datos biométricos
+/imagenes/
+/fotos/
+/datos/
+
+# Variables locales y secretos
+.env
+.env.*
+!.env.example
