@@ -24,7 +24,7 @@ def main() -> None:
         raise SystemExit(f"No pude abrir la imagen: {image_path}")
 
     detector = cv2.FaceDetectorYN.create(
-        str(YUNET_MODEL), "", (320, 320), 0.8, 0.3, 5000
+        str(YUNET_MODEL), "", (320, 320), 0.7, 0.3, 5000
     )
     detector.setInputSize((image.shape[1], image.shape[0]))
     recognizer = cv2.FaceRecognizerSF.create(str(SFACE_MODEL), "")
