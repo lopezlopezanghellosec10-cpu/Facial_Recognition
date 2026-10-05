@@ -62,8 +62,19 @@ def main() -> None:
         cv2.FaceRecognizerSF_FR_COSINE,
     )
     print(f"Similitud coseno: {similarity:.3f}")
+    COSINE_THRESHOLD = 0.363
+
+    if similarity >= COSINE_THRESHOLD:
+
+     print("Posible coincidencia")
     
+    else:
+     print("Sin coincidencia")
+
+
 if __name__ == "__main__":
     main()
+
+
 
 
