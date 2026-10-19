@@ -1,5 +1,6 @@
 # Entorno virtual y archivos temporales de Python
 .venv/
+.venv-*/
 __pycache__/
 *.py[cod]
 
