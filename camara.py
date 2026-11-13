@@ -22,7 +22,7 @@ MIN_FACE_HEIGHT_RATIO = 0.35
 MAX_FACE_HEIGHT_RATIO = 0.76
 CENTER_TOLERANCE_X = 0.12
 CENTER_TOLERANCE_Y = 0.12
-COSINE_THRESHOLD = 0.363
+DEFAULT_COSINE_THRESHOLD = 0.363
 
 
 def draw_label(frame, text, y, color, scale=0.7):
@@ -65,13 +65,22 @@ def main() -> None:
         default=0,
         help="Índice de la cámara (0 normalmente es la integrada; prueba 1 para una webcam USB)",
     )
+    parser.add_argument(
+        "--umbral",
+        type=float,
+        default=DEFAULT_COSINE_THRESHOLD,
+        help=f"Umbral de similitud coseno entre 0 y 1 (predeterminado: {DEFAULT_COSINE_THRESHOLD})",
+    )
     args = parser.parse_args()
+    if not 0.0 <= args.umbral <= 1.0:
+        parser.error("--umbral debe estar entre 0 y 1")
 
     database_features = load_face_features()
     person_count = len({person_id for person_id, _, _ in database_features})
     print(
         f"Cargadas {person_count} persona(s) y "
-        f"{len(database_features)} descriptor(es) facial(es) desde MySQL."
+        f"{len(database_features)} descriptor(es) facial(es) desde MySQL. "
+        f"Umbral coseno: {args.umbral:.3f}."
     )
 
     detector = cv2.FaceDetectorYN.create(
@@ -90,6 +99,7 @@ def main() -> None:
                 print("No se pudo leer el fotograma.")
                 break
 
+            frame = cv2.flip(frame, 1)
             height, width = frame.shape[:2]
             center_x, center_y = width // 2, height // 2
             guide_w = int(width * GUIDE_WIDTH_RATIO)
@@ -164,7 +174,7 @@ def main() -> None:
                             best_person = (person_id, name)
                             best_similarity = similarity
 
-                    if best_person is not None and best_similarity >= COSINE_THRESHOLD:
+                    if best_person is not None and best_similarity >= args.umbral:
                         guide_color = (60, 220, 60)
                         status = f"Reconocido: {best_person[1]}"
                         detail = f"Coincidencia | Coseno: {best_similarity:.3f}"
@@ -173,7 +183,7 @@ def main() -> None:
                         status = "Persona no registrada"
                         detail = (
                             f"Mejor coseno: {best_similarity:.3f} "
-                            f"| Umbral: {COSINE_THRESHOLD:.3f}"
+                            f"| Umbral: {args.umbral:.3f}"
                         )
 
                 cv2.rectangle(frame, (x, y), (x + face_w, y + face_h), guide_color, 2)
