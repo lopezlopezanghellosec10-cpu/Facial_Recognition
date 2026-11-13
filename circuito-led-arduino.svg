@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Conexión de Arduino con LED indicador de reconocimiento</title>
+  <desc id="desc">La computadora envía la señal de reconocimiento a un Arduino Uno por USB. Del pin digital 8 sale un cable hacia una resistencia de 220 o 330 ohms y luego al ánodo del LED. El cátodo regresa a GND.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f4f7fb}.card{fill:#fff;stroke:#d8e1ec;stroke-width:2}.title{font:700 30px Arial,sans-serif;fill:#172b4d}.subtitle{font:16px Arial,sans-serif;fill:#52637a}.label{font:700 16px Arial,sans-serif;fill:#20344f}.small{font:14px Arial,sans-serif;fill:#52637a}.pin{font:700 14px Arial,sans-serif;fill:#fff}.board{fill:#168c62;stroke:#0b6847;stroke-width:3}.wire{fill:none;stroke:#eb8c00;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.ground{fill:none;stroke:#334e68;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}.usb{fill:#8b9bad;stroke:#64788d;stroke-width:2}.chip{fill:#173d35}.hole{fill:#dff2e8;stroke:#0b6847;stroke-width:2}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#3973ac"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="760"/>
+  <text class="title" x="60" y="62">LED indicador de reconocimiento facial</text>
+  <text class="subtitle" x="60" y="93">Ejemplo con Arduino Uno · conexión serial por USB desde Python</text>
+  <rect class="card" x="50" y="125" width="1100" height="570" rx="18"/>
+
+  <!-- laptop -->
+  <rect x="98" y="242" width="210" height="135" rx="10" fill="#dce7f2" stroke="#71869c" stroke-width="3"/>
+  <rect x="112" y="256" width="182" height="106" rx="5" fill="#163b5c"/>
+  <text x="203" y="293" text-anchor="middle" font="700 16px Arial" fill="#fff">Python</text>
+  <text x="203" y="321" text-anchor="middle" font="14px Arial" fill="#cfe9ff">reconocimiento OK</text>
+  <path d="M78 385 H328 L306 400 H99 Z" fill="#9aabba" stroke="#71869c" stroke-width="2"/>
+  <text class="label" x="203" y="432" text-anchor="middle">Computadora</text>
+  <path d="M331 323 C382 323 392 280 440 280" fill="none" stroke="#3973ac" stroke-width="7" marker-end="url(#arrow)"/>
+  <text class="small" x="384" y="256" text-anchor="middle">USB</text>
+  <text class="small" x="385" y="347" text-anchor="middle">mensaje serial</text>
+
+  <!-- Arduino Uno -->
+  <rect class="board" x="445" y="205" width="420" height="320" rx="30"/>
+  <circle class="hole" cx="473" cy="233" r="12"/><circle class="hole" cx="837" cy="233" r="12"/>
+  <circle class="hole" cx="473" cy="497" r="12"/><circle class="hole" cx="837" cy="497" r="12"/>
+  <rect class="usb" x="415" y="265" width="45" height="62" rx="4"/>
+  <rect class="chip" x="555" y="300" width="184" height="110" rx="7"/>
+  <text x="647" y="351" text-anchor="middle" font="700 18px Arial" fill="#d5e8df">ATmega328P</text>
+  <text x="647" y="379" text-anchor="middle" font="14px Arial" fill="#a9c5b9">Arduino Uno</text>
+  <text x="494" y="240" font="700 18px Arial" fill="#fff">ARDUINO UNO</text>
+  <text class="pin" x="777" y="258">D8</text>
+  <circle cx="813" cy="254" r="8" fill="#efefef" stroke="#385d50" stroke-width="2"/>
+  <text class="pin" x="777" y="479">GND</text>
+  <circle cx="813" cy="475" r="8" fill="#efefef" stroke="#385d50" stroke-width="2"/>
+  <text x="654" y="557" text-anchor="middle" font="700 16px Arial" fill="#20344f">Arduino Uno</text>
+
+  <!-- series circuit D8 -> resistor -> LED -> GND -->
+  <path class="wire" d="M821 254 H908 V321 H952"/>
+  <rect x="952" y="306" width="102" height="30" rx="5" fill="#f5deb3" stroke="#a37b37" stroke-width="3"/>
+  <path d="M970 307 V335 M984 307 V335 M1018 307 V335 M1032 307 V335" stroke="#9e6232" stroke-width="4"/>
+  <path class="wire" d="M1054 321 H1086 V385"/>
+  <text class="label" x="1003" y="286" text-anchor="middle">220 Ω o 330 Ω</text>
+  <text class="small" x="1003" y="359" text-anchor="middle">resistencia</text>
+  <!-- LED -->
+  <path d="M1086 385 V411" stroke="#eb8c00" stroke-width="6"/>
+  <circle cx="1086" cy="439" r="28" fill="#e8f2ff" stroke="#3973ac" stroke-width="4"/>
+  <path d="M1072 425 L1096 439 L1072 453 Z" fill="#3973ac"/>
+  <path d="M1098 424 V454" stroke="#3973ac" stroke-width="4"/>
+  <path d="M1086 467 V488 H1029 V538 H813 V475" fill="none" stroke="#334e68" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1119 412 l19 -19 M1124 428 l25 -5" stroke="#f1b72b" stroke-width="4" stroke-linecap="round"/>
+  <text class="label" x="1065" y="518" text-anchor="middle">LED</text>
+  <text class="small" x="1065" y="540" text-anchor="middle">ánodo (+) desde resistencia</text>
+  <text class="small" x="910" y="568" text-anchor="middle">cátodo (−) a GND</text>
+
+  <rect x="82" y="600" width="1036" height="64" rx="12" fill="#eef5fb"/>
+  <text class="label" x="105" y="628">Conexiones:</text>
+  <text class="small" x="225" y="628">D8 → resistencia → pata larga (+) del LED</text>
+  <text class="small" x="225" y="650">Pata corta (−) del LED → GND · Arduino conectado a la computadora por USB</text>
+</svg>
