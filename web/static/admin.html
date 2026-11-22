@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es" data-theme="oscuro">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de la pluma</title>
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+
+    <!-- Mismo tema que la página de registro (se guarda en este navegador). -->
+    <script>
+        try {
+            var t = localStorage.getItem('pluma_tema');
+            if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.theme = t;
+        } catch (e) { }
+    </script>
+</head>
+
+<body>
+    <!-- ENTRAR -->
+    <section class="login" id="login" hidden>
+        <form class="login-caja" id="form-login" novalidate>
+            <div class="logo logo-grande" aria-hidden="true"></div>
+            <h1>Panel de la pluma</h1>
+            <p class="suave">Entra con la clave de administrador para revisar los registros.</p>
+            <label for="clave">Clave de administrador</label>
+            <input id="clave" type="password" autocomplete="current-password">
+            <p class="aviso" id="aviso-login" role="alert"></p>
+            <button class="boton" id="btn-login" type="submit">Entrar</button>
+        </form>
+    </section>
+
+    <!-- PANEL -->
+    <div class="app" id="app" hidden>
+        <header class="barra">
+            <div class="marca"><span class="logo" aria-hidden="true"></span> Panel de la pluma</div>
+
+            <div class="pestanas" role="group" aria-label="Qué registros ver">
+                <button class="pestana" type="button" data-estado="pendiente" aria-pressed="true">
+                    Pendientes <span class="cuenta" id="c-pendiente">0</span></button>
+                <button class="pestana" type="button" data-estado="aprobado" aria-pressed="false">
+                    Aprobadas <span class="cuenta" id="c-aprobado">0</span></button>
+                <button class="pestana" type="button" data-estado="rechazado" aria-pressed="false">
+                    Sin acceso <span class="cuenta" id="c-rechazado">0</span></button>
+            </div>
+
+            <div class="barra-acciones">
+                <button class="boton-chico" id="btn-tema" type="button">Tema claro</button>
+                <button class="boton-chico" id="btn-salir" type="button">Salir</button>
+            </div>
+        </header>
+
+        <div class="cuerpo" id="cuerpo" data-vista="lista">
+            <aside class="lista-caja" aria-label="Personas">
+                <ul class="lista" id="lista"></ul>
+                <p class="vacio" id="lista-vacia" hidden></p>
+            </aside>
+
+            <main class="detalle" id="detalle">
+                <p class="vacio vacio-grande" id="detalle-vacio">Elige a una persona de la lista para revisar su registro.</p>
+
+                <article class="persona" id="persona" hidden>
+                    <button class="volver" id="btn-volver" type="button">Volver a la lista</button>
+
+                    <header class="persona-cab">
+                        <h2 id="p-nombre" tabindex="-1"></h2>
+                        <p class="persona-sub">
+                            <span class="etiqueta" id="p-estado"></span>
+                            <span class="suave" id="p-hace"></span>
+                        </p>
+                    </header>
+
+                    <div id="p-alertas"></div>
+
+                    <section aria-labelledby="t-fotos">
+                        <h3 id="t-fotos">Fotos</h3>
+                        <div class="fotos" id="p-fotos"></div>
+                        <p class="nota" id="p-fotos-nota"></p>
+                    </section>
+
+                    <section aria-labelledby="t-datos">
+                        <h3 id="t-datos">Datos</h3>
+                        <dl class="datos" id="p-datos"></dl>
+                    </section>
+
+                    <section class="decision" id="p-decision" aria-label="Decisión"></section>
+                </article>
+            </main>
+        </div>
+    </div>
+
+    <!-- Foto ampliada -->
+    <dialog class="visor" id="visor" aria-label="Foto ampliada">
+        <img id="visor-img" alt="">
+        <button class="boton-chico" id="visor-cerrar" type="button">Cerrar</button>
+    </dialog>
+
+    <div class="avisos" id="avisos" role="status" aria-live="polite"></div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

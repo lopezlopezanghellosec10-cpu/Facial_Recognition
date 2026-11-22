@@ -1,0 +1,281 @@
+/* Panel de la pluma. Misma paleta que la página de registro:
+   asfalto, pintura vial y los colores del semáforo para los estados. */
+:root {
+    --fondo: #1b2130;
+    --panel: #232b3d;
+    --campo: #2d374c;
+    --linea: #3d4961;
+    --texto: #f2f4f7;
+    --suave: #a9b4c8;
+    --foco: #ffd23f;
+
+    --ok-fondo: #3ecf8e;
+    --ok-texto: #082418;
+    --ambar: #ffb020;
+    --rojo: #ef5350;
+    --rojo-texto: #ff8a84;
+    --verde: #3ecf8e;
+
+    --fuente-texto: "Barlow", system-ui, "Segoe UI", Roboto, sans-serif;
+    --fuente-titulo: "Barlow Condensed", "Arial Narrow", "Barlow", system-ui, sans-serif;
+}
+
+:root[data-theme="claro"] {
+    --fondo: #e3e7ee;
+    --panel: #f8f9fb;
+    --campo: #ffffff;
+    --linea: #b9c2d1;
+    --texto: #141a2a;
+    --suave: #4b5770;
+    --foco: #1b2130;
+
+    --ok-fondo: #0c8a5a;
+    --ok-texto: #ffffff;
+    --ambar: #c27a00;
+    --rojo: #c62f2b;
+    --rojo-texto: #b3231f;
+    --verde: #0c8a5a;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: dark; }
+html[data-theme="claro"] { color-scheme: light; }
+[hidden] { display: none !important; }
+
+body {
+    margin: 0;
+    background: var(--fondo);
+    color: var(--texto);
+    font: 400 1.0625rem/1.5 var(--fuente-texto);
+}
+
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; }
+h2:focus { outline: none; }
+.suave { color: var(--suave); }
+
+/* El brazo de la pluma como logotipo */
+.logo {
+    display: inline-block; width: 38px; height: 12px; border-radius: 3px;
+    background: repeating-linear-gradient(135deg, #e8453c 0 6px, #f2f4f7 6px 12px);
+}
+.logo-grande { width: 120px; height: 18px; border-radius: 4px; margin-bottom: 18px; }
+
+/* ----------------------------------------------------------- botones */
+.boton {
+    display: block; width: 100%; min-height: 52px; padding: 0 22px;
+    border: 2px solid var(--foco); border-radius: 10px;
+    background: var(--foco); color: var(--fondo);
+    font: 700 1.125rem var(--fuente-texto); cursor: pointer;
+}
+:root[data-theme="claro"] .boton { color: #ffd23f; }
+.boton:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.boton-chico {
+    min-height: 40px; padding: 0 14px;
+    border: 2px solid var(--linea); border-radius: 999px;
+    background: var(--campo); color: var(--texto);
+    font: 600 0.95rem var(--fuente-texto); cursor: pointer;
+}
+
+.btn-aprobar, .btn-rechazar, .btn-neutro {
+    min-height: 52px; padding: 0 22px;
+    border: 2px solid transparent; border-radius: 10px;
+    font: 700 1.1rem var(--fuente-texto); cursor: pointer;
+}
+.btn-aprobar { background: var(--ok-fondo); color: var(--ok-texto); }
+.btn-rechazar { background: transparent; color: var(--rojo-texto); border-color: var(--rojo); }
+.btn-neutro { background: transparent; color: var(--texto); border-color: var(--linea); }
+.btn-aprobar:disabled, .btn-rechazar:disabled, .btn-neutro:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ------------------------------------------------------------- login */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.login-caja {
+    width: min(100%, 420px); padding: 28px;
+    background: var(--panel); border: 2px solid var(--linea); border-radius: 14px;
+}
+.login-caja h1 { font: 800 2.4rem/1 var(--fuente-titulo); margin-bottom: 8px; }
+.login-caja p { margin: 0 0 16px; }
+label { display: block; margin-bottom: 6px; font-weight: 600; }
+input[type="password"], textarea {
+    width: 100%; padding: 0 14px;
+    border: 2px solid var(--linea); border-radius: 10px;
+    background: var(--campo); color: var(--texto);
+    font: 500 1.0625rem var(--fuente-texto);
+}
+input[type="password"] { min-height: 52px; margin-bottom: 14px; }
+textarea { padding: 10px 14px; min-height: 96px; resize: vertical; line-height: 1.4; }
+
+.aviso {
+    margin: 0 0 14px; padding: 10px 12px;
+    border-left: 4px solid var(--rojo); border-radius: 6px; background: var(--campo);
+}
+.aviso:empty { display: none; }
+
+/* --------------------------------------------------------- estructura */
+.app { height: 100vh; height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+
+.barra {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
+    padding: 10px 16px;
+    background: var(--panel); border-bottom: 2px solid var(--linea);
+}
+.marca { display: flex; align-items: center; gap: 10px; font: 800 1.5rem var(--fuente-titulo); }
+.pestanas { display: flex; gap: 6px; margin-right: auto; flex-wrap: wrap; }
+.pestana {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 14px;
+    border: 2px solid transparent; border-radius: 10px;
+    background: transparent; color: var(--suave);
+    font: 600 1rem var(--fuente-texto); cursor: pointer;
+}
+.pestana[aria-pressed="true"] { color: var(--texto); background: var(--campo); border-color: var(--foco); }
+.cuenta {
+    min-width: 26px; padding: 0 8px; border-radius: 999px;
+    background: var(--linea); color: var(--texto);
+    text-align: center; font-size: 0.9rem; font-weight: 700;
+}
+.cuenta.hay { background: var(--ambar); color: #1b2130; }
+:root[data-theme="claro"] .cuenta.hay { color: #fff; }
+.barra-acciones { display: flex; gap: 8px; }
+
+.cuerpo { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); min-height: 0; }
+
+/* ------------------------------------------------------------- lista */
+.lista-caja { overflow-y: auto; padding: 10px; border-right: 2px solid var(--linea); }
+.lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.fila {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+    width: 100%; padding: 12px 14px;
+    border: 2px solid transparent; border-radius: 10px;
+    background: transparent; color: var(--texto);
+    text-align: left; font-family: var(--fuente-texto); cursor: pointer;
+}
+.fila:hover { background: var(--panel); }
+.fila.activa { background: var(--panel); border-color: var(--foco); }
+.fila-nombre { font-weight: 700; font-size: 1.1rem; line-height: 1.2; }
+.fila-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; color: var(--suave); font-size: 0.95rem; }
+.insignia {
+    padding: 0 8px; border-radius: 6px; border: 2px solid var(--ambar);
+    color: var(--texto); font-size: 0.85rem; font-weight: 700;
+}
+.vacio { margin: 24px 12px; color: var(--suave); }
+
+/* ----------------------------------------------------------- detalle */
+.detalle { overflow-y: auto; padding: clamp(16px, 3vw, 32px); }
+.vacio-grande { margin: 12vh auto 0; max-width: 28ch; text-align: center; font-size: 1.2rem; }
+.persona { max-width: 880px; display: grid; gap: 26px; }
+.volver {
+    display: none; justify-self: start;
+    min-height: 44px; padding: 0 14px;
+    border: 2px solid var(--linea); border-radius: 10px;
+    background: transparent; color: var(--texto);
+    font: 600 1rem var(--fuente-texto); cursor: pointer;
+}
+.persona-cab h2 { font: 800 clamp(2rem, 4vw, 2.8rem)/1.05 var(--fuente-titulo); }
+.persona-sub { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; }
+h3 { font: 700 1.4rem/1.2 var(--fuente-titulo); margin-bottom: 10px; }
+
+.etiqueta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 2px 12px; border: 2px solid var(--linea); border-radius: 999px;
+    font-weight: 700;
+}
+.etiqueta::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--suave); }
+.etiqueta[data-estado="pendiente"]::before { background: var(--ambar); }
+.etiqueta[data-estado="aprobado"]::before { background: var(--verde); }
+.etiqueta[data-estado="rechazado"]::before { background: var(--rojo); }
+
+/* alertas dentro de la ficha */
+.alerta {
+    margin: 0 0 10px; padding: 12px 14px;
+    border-left: 5px solid var(--ambar); border-radius: 8px; background: var(--panel);
+}
+.alerta strong { display: block; }
+.alerta-roja { border-left-color: var(--rojo); }
+
+/* fotos */
+.fotos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.foto { margin: 0; }
+.foto-marco {
+    aspect-ratio: 3 / 4; display: grid; place-items: center;
+    padding: 8px; text-align: center;
+    background: #0c1019; color: #c9d2e3; border-radius: 10px; overflow: hidden;
+    font-size: 0.95rem;
+}
+.foto-boton { display: block; width: 100%; height: 100%; margin: -8px; padding: 0; border: 0; background: none; cursor: zoom-in; }
+.foto-boton img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.foto figcaption { margin-top: 6px; font-weight: 600; }
+.nota { margin: 10px 0 0; color: var(--suave); }
+
+/* datos */
+.datos { display: grid; grid-template-columns: max-content 1fr; gap: 8px 20px; margin: 0; }
+.datos dt { color: var(--suave); }
+.datos dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+
+/* decisión */
+.decision {
+    position: sticky; bottom: 0;
+    padding: 14px 0 6px; background: var(--fondo);
+    border-top: 2px solid var(--linea);
+}
+/* Con el formulario abierto (aprobar, rechazar) ya no se queda pegada abajo:
+   así no tapa las fotos, que es lo que se está revisando. */
+.decision.abierta { position: static; }
+.decision-botones { display: flex; flex-wrap: wrap; gap: 10px; }
+.decision-botones > * { flex: 1 1 200px; }
+.confirmar { display: grid; gap: 12px; }
+.confirmar p { margin: 0; }
+.motivos { display: flex; flex-wrap: wrap; gap: 8px; }
+.motivo-rapido {
+    min-height: 40px; padding: 0 12px;
+    border: 2px solid var(--linea); border-radius: 999px;
+    background: var(--campo); color: var(--texto);
+    font: 500 0.95rem var(--fuente-texto); cursor: pointer;
+}
+.error { margin: 0; color: var(--rojo-texto); font-weight: 600; }
+.error:empty { display: none; }
+
+/* ------------------------------------------------------------- foto grande */
+.visor { padding: 0; border: 0; background: transparent; max-width: min(92vw, 720px); color: var(--texto); }
+.visor::backdrop { background: rgba(5, 8, 15, 0.82); }
+.visor img { display: block; max-width: 100%; max-height: 82vh; margin: 0 auto 10px; border-radius: 10px; }
+.visor .boton-chico { display: block; margin: 0 auto; }
+
+/* ----------------------------------------------------------- avisos */
+.avisos {
+    position: fixed; left: 50%; bottom: 16px; z-index: 20; transform: translateX(-50%);
+    width: min(92vw, 520px); display: grid; gap: 8px;
+}
+.aviso-flotante {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; background: var(--panel); color: var(--texto);
+    border: 2px solid var(--linea); border-left: 6px solid var(--verde); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.aviso-flotante.error-aviso { border-left-color: var(--rojo); }
+.aviso-flotante.info-aviso { border-left-color: var(--ambar); }
+.aviso-flotante p { margin: 0; flex: 1; }
+.aviso-flotante button {
+    min-height: 32px; padding: 0 10px; border: 2px solid var(--linea); border-radius: 8px;
+    background: transparent; color: var(--texto); font: 600 0.9rem var(--fuente-texto); cursor: pointer;
+}
+
+/* ------------------------------------------------------------ celular */
+@media (max-width: 860px) {
+    .cuerpo { grid-template-columns: minmax(0, 1fr); }
+    .cuerpo[data-vista="lista"] .detalle { display: none; }
+    .cuerpo[data-vista="detalle"] .lista-caja { display: none; }
+    .lista-caja { border-right: 0; }
+    .volver { display: inline-block; }
+    .barra { gap: 8px 10px; padding: 8px 12px; }
+    .marca { font-size: 1.15rem; gap: 8px; white-space: nowrap; }
+    .logo { width: 30px; }
+    .barra-acciones { margin-left: auto; gap: 6px; }
+    .barra-acciones .boton-chico { min-height: 36px; padding: 0 10px; font-size: 0.9rem; }
+    .pestanas { order: 3; width: 100%; margin-right: 0; flex-wrap: nowrap; gap: 4px; }
+    .pestana { flex: 1 1 0; min-width: 0; justify-content: center; gap: 6px; padding: 0 2px; font-size: 0.9rem; white-space: nowrap; }
+    .cuenta { min-width: 22px; padding: 0 6px; font-size: 0.85rem; }
+    .datos { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .datos dd { margin-bottom: 10px; }
+}

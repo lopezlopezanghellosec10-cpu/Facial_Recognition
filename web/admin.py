@@ -5,11 +5,14 @@ import os
 from enum import StrEnum
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, field_validator
 
+from . import fotos
 from .limites import Limitador
 from .notificaciones import notificar
 from .repositorio import (
+    ANGULOS,
     aprobar_persona,
     contar_por_estado,
     listar_por_estado,
@@ -111,7 +114,28 @@ def listar(estado: Estado = Estado.pendiente):
 def detalle(persona_id: int):
     persona = _cargar_persona(persona_id)
     persona["parecidos"] = _buscar_parecidos(persona_id)
+    # Las fotos solo existen mientras la persona está pendiente.
+    persona["fotos_disponibles"] = (
+        fotos.disponibles(persona_id)
+        if persona["estado"] == "pendiente"
+        else {angulo: False for angulo in ANGULOS}
+    )
     return persona
+
+
+@router.get("/personas/{persona_id}/foto/{angulo}")
+def ver_foto(persona_id: int, angulo: str):
+    """Entrega una foto temporal para que el administrador la revise."""
+    ruta = fotos.ruta_foto(persona_id, angulo)
+    if ruta is None:
+        raise HTTPException(
+            status_code=404, detail="Esa foto no existe o ya fue eliminada."
+        )
+    return FileResponse(
+        ruta,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+    )
 
 
 @router.post("/personas/{persona_id}/aprobar")
@@ -131,6 +155,7 @@ def aprobar(persona_id: int, segundo_plano: BackgroundTasks):
     if not aprobar_persona(persona_id):
         raise HTTPException(status_code=409, detail="Esta persona ya fue revisada.")
 
+    eliminadas = fotos.borrar_fotos(persona_id)
     segundo_plano.add_task(
         notificar,
         persona["correo"],
@@ -138,7 +163,11 @@ def aprobar(persona_id: int, segundo_plano: BackgroundTasks):
         f"Hola {persona['nombre']}, tu registro fue aprobado. "
         "Ya puedes usar el acceso automático de la pluma.",
     )
-    return {"persona_id": persona_id, "estado": "aprobado"}
+    return {
+        "persona_id": persona_id,
+        "estado": "aprobado",
+        "fotos_eliminadas": eliminadas,
+    }
 
 
 @router.post("/personas/{persona_id}/rechazar")
@@ -151,6 +180,7 @@ def rechazar(persona_id: int, datos: MotivoEntrada, segundo_plano: BackgroundTas
     if not rechazar_persona(persona_id, datos.motivo):
         raise HTTPException(status_code=409, detail="Esta persona ya fue revisada.")
 
+    eliminadas = fotos.borrar_fotos(persona_id)
     segundo_plano.add_task(
         notificar,
         persona["correo"],
@@ -159,7 +189,12 @@ def rechazar(persona_id: int, datos: MotivoEntrada, segundo_plano: BackgroundTas
         f"Motivo: {datos.motivo}\n\n"
         "Puedes volver a registrarte con el mismo correo corrigiendo lo indicado.",
     )
-    return {"persona_id": persona_id, "estado": "rechazado", "motivo": datos.motivo}
+    return {
+        "persona_id": persona_id,
+        "estado": "rechazado",
+        "motivo": datos.motivo,
+        "fotos_eliminadas": eliminadas,
+    }
 
 
 @router.post("/personas/{persona_id}/revocar")
@@ -173,6 +208,7 @@ def revocar(persona_id: int, datos: MotivoEntrada, segundo_plano: BackgroundTask
     if not revocar_persona(persona_id, datos.motivo):
         raise HTTPException(status_code=409, detail="Esta persona ya fue revisada.")
 
+    eliminadas = fotos.borrar_fotos(persona_id)
     segundo_plano.add_task(
         notificar,
         persona["correo"],
@@ -180,4 +216,9 @@ def revocar(persona_id: int, datos: MotivoEntrada, segundo_plano: BackgroundTask
         f"Hola {persona['nombre']}, tu acceso automático a la pluma fue desactivado.\n\n"
         f"Motivo: {datos.motivo}",
     )
-    return {"persona_id": persona_id, "estado": "rechazado", "motivo": datos.motivo}
+    return {
+        "persona_id": persona_id,
+        "estado": "rechazado",
+        "motivo": datos.motivo,
+        "fotos_eliminadas": eliminadas,
+    }
