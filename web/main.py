@@ -1,3 +1,6 @@
+import logging
+import os
+from contextlib import asynccontextmanager
 from enum import StrEnum
 from pathlib import Path
 
@@ -11,16 +14,17 @@ from fastapi import (
     Request,
     UploadFile,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import admin
+from . import admin, fotos
 from .esquemas import RegistroEntrada
 from .limites import Limitador
 from .repositorio import (
     CorreoDuplicado,
     crear_persona_pendiente,
     guardar_rostro,
+    listar_por_estado,
     obtener_descriptores,
     obtener_estado_registro,
     obtener_hash_token,
@@ -34,16 +38,43 @@ from .rostros import (
 )
 from .seguridad import generar_token, hash_token, token_coincide
 
+logger = logging.getLogger("pluma.web")
+
 TAMANO_MAXIMO = 5 * 1024 * 1024  # 5 MB por foto
 CARPETA_PAGINA = Path(__file__).resolve().parent / "static"
 CARPETA_PAGINA.mkdir(exist_ok=True)
+
+# Con PLUMA_PUBLICO=1 (cuando la página se publica en internet) se apaga la
+# documentación automática /docs: es para desarrolladores y no hace falta afuera.
+PUBLICO = os.getenv("PLUMA_PUBLICO") == "1"
 
 # Límites por IP: (peticiones, segundos)
 limite_registro = Limitador(20, 600)
 limite_fotos = Limitador(60, 600)
 limite_estado = Limitador(120, 600)
 
-app = FastAPI(title="Registro Pluma")
+
+@asynccontextmanager
+async def ciclo_de_vida(app: FastAPI):
+    """Al arrancar, borra fotos que hayan quedado de personas que ya no están pendientes."""
+    try:
+        pendientes = {persona["id"] for persona in listar_por_estado("pendiente")}
+        borradas = fotos.limpiar_huerfanas(pendientes)
+        if borradas:
+            logger.info("Se borraron las fotos sueltas de %s persona(s).", borradas)
+    except Exception:
+        # Si MySQL está apagado el servidor arranca igual; se limpia en el próximo arranque.
+        logger.warning("No se pudo limpiar las fotos sueltas al arrancar.", exc_info=True)
+    yield
+
+
+app = FastAPI(
+    title="Registro Pluma",
+    lifespan=ciclo_de_vida,
+    docs_url=None if PUBLICO else "/docs",
+    redoc_url=None if PUBLICO else "/redoc",
+    openapi_url=None if PUBLICO else "/openapi.json",
+)
 app.include_router(admin.router)
 
 
@@ -65,6 +96,12 @@ async def base_de_datos_caida(request: Request, error: ConnectionError):
 @app.get("/salud")
 def salud():
     return {"ok": True}
+
+
+@app.get("/panel", include_in_schema=False)
+def panel():
+    """Atajo fácil de escribir para el panel del administrador."""
+    return RedirectResponse("/admin.html")
 
 
 @app.post("/registro", status_code=201, dependencies=[Depends(limite_registro)])
@@ -100,7 +137,8 @@ def subir_rostro(
         raise HTTPException(status_code=413, detail="La foto pesa más de 5 MB.")
 
     try:
-        descriptor = extraer_descriptor(decodificar_imagen(datos))
+        imagen = decodificar_imagen(datos)
+        descriptor = extraer_descriptor(imagen)
     except RostroInvalido as error:
         raise HTTPException(status_code=422, detail=str(error))
 
@@ -114,6 +152,22 @@ def subir_rostro(
                 status_code=422,
                 detail="Esta foto no parece ser de la misma persona que las anteriores.",
             )
+
+    # La foto se guarda solo para que el administrador la revise; se borra al decidir.
+    try:
+        fotos.guardar_foto(persona_id, angulo.value, imagen)
+    except OSError:
+        logger.exception("No se pudo guardar la foto temporal de la persona %s", persona_id)
+        raise HTTPException(
+            status_code=500, detail="No pudimos guardar tu foto. Intenta de nuevo."
+        )
+
+    # Si alguien decidió justo mientras subías la foto, no dejamos fotos sueltas.
+    if obtener_hash_token(persona_id) is None:
+        fotos.borrar_fotos(persona_id)
+        raise HTTPException(
+            status_code=403, detail="Token inválido o registro ya cerrado."
+        )
 
     guardados = guardar_rostro(persona_id, angulo.value, descriptor)
     faltan = [a.value for a in Angulo if a.value not in guardados]

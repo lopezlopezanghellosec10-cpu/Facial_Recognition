@@ -1,47 +1,162 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="oscuro">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registro Pluma</title>
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            font-family: system-ui, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-        }
+    <title>Registro de la pluma</title>
+    <meta name="theme-color" content="#1b2130">
 
-        main {
-            text-align: center;
-            padding: 24px;
-        }
+    <!-- Barlow: la familia tipográfica inspirada en las señales de carretera.
+         Si no hay internet, el navegador usa la fuente de respaldo del CSS. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 
-        h1 {
-            font-size: 2.2rem;
-            margin: 0 0 8px;
-        }
+    <link rel="stylesheet" href="styles.css">
 
-        p {
-            color: #94a3b8;
-        }
-
-        a {
-            color: #38bdf8;
-        }
-    </style>
+    <!-- Aplica el tema guardado antes de pintar la página, para que no parpadee. -->
+    <script>
+        try {
+            var t = localStorage.getItem('pluma_tema');
+            if (t === 'claro' || t === 'oscuro') document.documentElement.dataset.theme = t;
+        } catch (e) { }
+    </script>
 </head>
 
 <body>
-    <main>
-        <h1>Registro Pluma</h1>
-        <p>Aquí va a vivir la página de registro. El servidor ya la está sirviendo.</p>
-        <p><a href="/docs">Ver la documentación de la API</a></p>
-    </main>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <button class="tema" id="btn-tema" type="button">Tema claro</button>
+
+    <div class="pagina">
+
+        <!-- Escena: la pluma sube conforme avanzas en el registro. -->
+        <header class="escena" id="escena" data-fase="datos">
+            <svg class="barrera" viewBox="0 -12 360 272" role="img"
+                aria-label="Pluma de estacionamiento que sube conforme avanzas en el registro">
+                <defs>
+                    <pattern id="rayas" width="32" height="32" patternUnits="userSpaceOnUse"
+                        patternTransform="rotate(45)">
+                        <rect width="16" height="32" fill="#e8453c" />
+                        <rect x="16" width="16" height="32" fill="#f2f4f7" />
+                    </pattern>
+                </defs>
+
+                <rect class="calle" x="0" y="244" width="360" height="16" />
+                <line x1="0" y1="252" x2="360" y2="252" stroke="#ffd23f" stroke-width="3"
+                    stroke-dasharray="22 16" />
+
+                <!-- El brazo gira desde el punto (96, 190), que queda dentro del poste. -->
+                <g class="brazo" style="transform-origin: 96px 190px">
+                    <rect class="contrapeso" x="52" y="184" width="44" height="12" rx="3" />
+                    <rect x="96" y="182" width="200" height="16" rx="4" fill="url(#rayas)" />
+                </g>
+
+                <rect class="poste" x="70" y="176" width="52" height="68" rx="8" />
+                <rect class="poste" x="62" y="238" width="68" height="8" rx="3" />
+                <circle class="luz" cx="96" cy="210" r="9" />
+            </svg>
+
+            <h1>Regístrate y la pluma te abre sola</h1>
+            <p class="bajada">Llena tus datos, tómate tres fotos del rostro y espera el visto bueno.
+                Te toma menos de dos minutos.</p>
+            <p class="estado-pluma" id="estado-pluma" aria-live="polite">La pluma está cerrada.</p>
+        </header>
+
+        <main class="panel" id="contenido">
+            <ol class="pasos" id="pasos">
+                <li data-vista="datos"><span class="num">1</span> Datos</li>
+                <li data-vista="fotos"><span class="num">2</span> Fotos</li>
+                <li data-vista="estado"><span class="num">3</span> Revisión</li>
+            </ol>
+
+            <p class="cargando" id="cargando">Cargando…</p>
+            <noscript><p class="aviso">Esta página necesita JavaScript para funcionar.</p></noscript>
+
+            <!-- PASO 1: datos -->
+            <section class="paso" id="paso-datos" aria-labelledby="t-datos" hidden>
+                <h2 id="t-datos" tabindex="-1">Tus datos</h2>
+                <form id="form-datos" novalidate>
+                    <div class="campo">
+                        <label for="nombre">Nombre completo</label>
+                        <input id="nombre" name="nombre" autocomplete="name" maxlength="120"
+                            placeholder="Nombre y apellido" aria-describedby="err-nombre">
+                        <p class="error" id="err-nombre"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="telefono">Teléfono de 10 dígitos</label>
+                        <input id="telefono" name="telefono" type="tel" inputmode="tel"
+                            autocomplete="tel-national" placeholder="667 123 4567"
+                            aria-describedby="err-telefono">
+                        <p class="error" id="err-telefono"></p>
+                    </div>
+                    <div class="campo">
+                        <label for="correo">Correo electrónico</label>
+                        <input id="correo" name="correo" type="email" inputmode="email"
+                            autocomplete="email" maxlength="120" placeholder="tucorreo@gmail.com"
+                            aria-describedby="err-correo">
+                        <p class="error" id="err-correo"></p>
+                    </div>
+                    <div class="campo">
+                        <label class="casilla" for="acepto">
+                            <input id="acepto" name="acepto" type="checkbox" aria-describedby="err-acepto">
+                            <span>Acepto que mis fotos las vea el administrador solo para revisar mi registro.
+                                Se borran cuando lo aprueba o lo rechaza, y solo se conserva un código numérico
+                                de mi rostro para abrir la pluma.</span>
+                        </label>
+                        <p class="error" id="err-acepto"></p>
+                    </div>
+                    <p class="aviso" id="aviso-datos" role="alert"></p>
+                    <button class="boton" id="btn-datos" type="submit">Continuar</button>
+                </form>
+            </section>
+
+            <!-- PASO 2: fotos -->
+            <section class="paso" id="paso-fotos" aria-labelledby="t-fotos" hidden>
+                <h2 id="t-fotos" tabindex="-1">Tus fotos</h2>
+                <p class="guia" id="guia-pose"></p>
+
+                <div class="visor" id="visor">
+                    <video id="video" playsinline muted></video>
+                    <div class="ovalo" aria-hidden="true"></div>
+                    <div class="giro" id="giro" aria-hidden="true" hidden>
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 5l-7 7 7 7" />
+                        </svg>
+                    </div>
+                    <div class="cuenta" id="cuenta" aria-hidden="true"></div>
+                    <div class="analizando" id="analizando" hidden>
+                        <span>Revisando tu foto…</span>
+                    </div>
+                    <div class="sin-camara" id="sin-camara" hidden>
+                        <p id="msg-camara"></p>
+                    </div>
+                </div>
+
+                <ul class="poses" id="poses"></ul>
+
+                <p class="aviso" id="aviso-fotos" role="alert"></p>
+
+                <div class="acciones">
+                    <button class="boton" id="btn-foto" type="button">Tomar foto</button>
+                    <button class="boton boton-sec" id="btn-archivo" type="button">Subir una foto</button>
+                    <input type="file" id="archivo" accept="image/*" capture="user" hidden>
+                </div>
+            </section>
+
+            <!-- PASO 3: estado del registro -->
+            <section class="paso" id="paso-estado" aria-labelledby="t-estado" hidden>
+                <h2 id="t-estado" tabindex="-1"></h2>
+                <p id="estado-texto"></p>
+                <blockquote class="motivo" id="estado-motivo" hidden></blockquote>
+                <button class="boton boton-sec" id="btn-reintentar" type="button" hidden>Volver a registrarme</button>
+            </section>
+        </main>
+    </div>
+
+    <p class="sr-only" id="anuncio" aria-live="polite"></p>
+    <script src="registro.js"></script>
 </body>
 
 </html>
